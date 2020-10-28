@@ -1,0 +1,112 @@
+#!/usr/bin/zsh
+
+# safe versions
+alias mv='mv -i'
+alias rm='rm -i'
+
+# colors
+
+alias ls='ls --color=auto'
+#alias dir='dir --color=auto'
+#alias vdir='vdir --color=auto'
+
+alias grep='grep --color=auto'
+alias fgrep='fgrep --color=auto'
+alias egrep='egrep --color=auto'
+
+# nice ls
+
+alias ll='ls -alF'
+alias la='ls -A --ignore=.directory'
+alias l='ls -CF'
+
+#alias ls='command ls -F --color=auto'
+#alias lsa='command ls -Fa --color=auto'
+#alias lsl='command ls -Flh --color=auto'
+#alias lsla='command ls -Flah --color=auto'
+
+# edit zsh config
+
+alias zshedit='$EDITOR $HOME/.zshrc'
+
+# reload zsh config
+
+alias zshreload='source $HOME/.zshrc'
+
+# open all files in current directory in neovim
+
+alias avim='nvim -p $(command ls)'
+
+# ssh into <user>@pi
+
+function sshpi() {
+    [[ $# -eq 1 ]] && \
+        ssh "${1}@pi" || \
+        echo "Usage: sshpi <user>"
+}
+        
+
+# Use lf to switch directories
+
+lf () {
+    tmp="$(mktemp)"
+    command lf -last-dir-path="$tmp" "$@"
+    if [ -f "$tmp" ]; then
+        dir="$(cat "$tmp")"
+        rm -f "$tmp"
+        [ -d "$dir" ] && [ "$dir" != "$(pwd)" ] \
+        && cd "$dir"
+    fi
+}
+
+# edit startup-scripts
+
+function startup-scripts-edit () {
+	nvim /usr/local/bin/startup-scripts
+}
+
+# assemble and link file
+
+function assemble() {
+    for asmfile in "$@"
+    do
+        filename="${asmfile%%'.asm'}"
+        ofile="${filename}.o"
+        xfile="${filename}.x"
+
+        as -o "$ofile" "$asmfile" && \
+        echo "assembly successful" && \
+        ld -o "$xfile" "$ofile" && \
+        echo "linking successful" && \
+        rm "$ofile"
+    done
+}
+
+# create bootable usb with given iso
+
+function flashiso() {
+    #[[ "$EUID" -ne 0 ]] && \
+    #{
+    #    echo "run $0 as a root"
+    #    result="error"
+    #}
+    if ! [[ "$1" =~ '.iso$' ]]; then
+        echo "first arg is not an .iso file"
+        result="error"
+    fi
+    if [[ "$2" =~ '^/dev/' ]]; then
+        if [[ "$2" =~ '^/dev/sda' ]]; then
+            echo "bruh watch what you dd..."
+            result="error"
+        fi
+    else
+        echo "second arg is not a disk device file"
+        result="error"
+    fi
+    [[ -z "$result" ]] || return
+    echo "dd bs=4M if=$1 of=$2 status=progress oflag=sync"
+}
+
+
+
+

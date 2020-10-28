@@ -1,0 +1,10 @@
+#!/usr/bin/zsh
+
+# export all paths
+
+#PATH="/home/matt/applications/backup/system:$PATH"
+#PATH="/home/matt/applications/backup/power_management:$PATH"
+#PATH="/home/matt/applications/backup/misc:$PATH"
+#PATH="/home/matt/applications/bspwm/lemonbar:$PATH"
+
+PATH="/home/matt/.local/bin:$PATH"

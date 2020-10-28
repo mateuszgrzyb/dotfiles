@@ -1,0 +1,58 @@
+#!/usr/bin/zsh
+
+
+CURSOR_NORMAL='\e[2 q'
+CURSOR_VISUAL='\e[2 q'
+CURSOR_INSERT='\e[6 q'
+
+RPROMPT='%B%F{yellow} %~'
+
+
+function user-info () {
+    [[ $UID -eq 0 ]] \
+        && echo '%B%F{red}###%f%b' \
+        || echo '$$$'
+}
+
+function prompt_text () { echo "[${1}]" $(user-info)" %b" }
+function insert-mode () { echo "%B%F{cyan}INSERT%f%b" }
+function normal-mode () { echo "%B%F{blue}NORMAL%f%b" }
+function visual-mode () { echo "%B%F{red}VISUAL%f%b" }
+
+precmd () {
+
+    # this is required for initial prompt and a problem I had with Ctrl+C or
+    # Enter when in normal mode (a new line would come up in insert mode,
+    # but normal mode would be indicated)
+    # prompt="%{$terminfo_down_sc$(insert-mode)$terminfo[rc]%}$prompt_text"
+    PROMPT="$(prompt_text $(insert-mode))"
+    echo -ne "$CURSOR_INSERT"
+}
+
+function set-prompt () {
+    case ${KEYMAP} in 
+        (vivis|vivli)   
+            VI_MODE="$(visual-mode)"
+            echo -ne "$CURSOR_VISUAL" 
+            ;;
+        (vicmd)         
+            VI_MODE="$(normal-mode)" 
+            echo -ne "$CURSOR_NORMAL" 
+            ;;
+        (*)    
+            VI_MODE="$(insert-mode)"
+            echo -ne "$CURSOR_INSERT" 
+            ;;
+    esac
+
+    PROMPT="$(prompt_text $VI_MODE)"
+}
+
+function zle-line-init zle-keymap-select {
+    set-prompt
+    zle reset-prompt
+}
+preexec () { print -rn -- $terminfo[el]; }
+
+zle -N zle-line-init
+zle -N zle-keymap-select

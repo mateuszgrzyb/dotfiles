@@ -1,0 +1,9 @@
+#!/usr/bin/zsh
+
+# key bindings for better visual mode
+
+# source "$ZSH_CONFIGS/src/zsh-vimode-visual-config.zsh"
+
+zle -N autosuggest-execute
+
+bindkey '^ ' autosuggest-execute
