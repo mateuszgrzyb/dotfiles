@@ -1,5 +1,8 @@
 #!/usr/bin/zsh
 
+# dotfiles
+alias dotfiles='git --git-dir=.cfg --work-tree=$HOME'
+
 # safe versions
 alias mv='mv -i'
 alias rm='rm -i'
@@ -106,7 +109,6 @@ function flashiso() {
     [[ -z "$result" ]] || return
     echo "dd bs=4M if=$1 of=$2 status=progress oflag=sync"
 }
-
 
 
 
