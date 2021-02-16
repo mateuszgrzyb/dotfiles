@@ -1,0 +1,49 @@
+#!/usr/bin/zsh 
+# prompt
+
+setopt prompt_subst
+
+# function for getting the git branch
+
+function git_branch {
+    # Speed up opening up a new terminal tab by not
+    # checking $HOME... which can't be a repo anyway
+    [ "$PWD" = "$HOME" ] && return
+
+    # Fastest way I know to check the current branch name
+    ref="$(command git symbolic-ref --short HEAD 2> /dev/null)" || return
+    echo "($ref)"
+}
+
+# functions for setting the prompt-mode info
+function insert_mode() { echo " -- INSERT -- " }
+function normal_mode() { echo " -- NORMAL -- " }
+function visual_mode() { echo " -- VISUAL -- " }
+
+autoload -Uz vcs_info
+precmd_vcs_info() { vcs_info }
+
+precmd_functions=( 
+    precmd_vcs_info 
+)
+
+setopt prompt_subst
+GIT_NULL="####"
+PROMPT='%B%F{cyan}{'\${vcs_info_msg_0_:-$GIT_NULL}'}%f%B %% %b'
+RPROMPT='%B%F{yellow}(%~)'
+zstyle ':vcs_info:git:*' formats '%b'
+zstyle ':vcs_info:*' enable git
+
+
+#PROMPT="%B%{$fg[cyan]%}$(git_branch)%{$fg[white]%} $ %{$reset_color%}" 
+#RPROMPT="%B(%{$fg[yellow]%}%~%{$fg[white])%}%{$reset_color%}"
+
+
+
+
+
+
+
+
+
+

@@ -44,7 +44,7 @@ ZSH_CONFIGS="$HOME/.config/zsh"
 
 source "$ZSH_CONFIGS/aliasrc"
 source "$ZSH_CONFIGS/pathrc"
-source "$ZSH_CONFIGS/newpromptrc"
+source "$ZSH_CONFIGS/promptrc"
 source "$ZSH_CONFIGS/bindrc"
 
 # Load plugins
@@ -61,4 +61,7 @@ add-zsh-hook -Uz chpwd () { l; }
 
 # start with listed files, but not in vscode
 [[ $TERM_PROGRAM == "vscode" ]] || l
+
+# opam configuration
+test -r /home/matt/.opam/opam-init/init.sh && . /home/matt/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
 

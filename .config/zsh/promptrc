@@ -1,49 +1,58 @@
-#!/usr/bin/zsh 
-# prompt
+#!/usr/bin/zsh
 
-setopt prompt_subst
 
-# function for getting the git branch
+CURSOR_NORMAL='\e[2 q'
+CURSOR_VISUAL='\e[2 q'
+CURSOR_INSERT='\e[6 q'
 
-function git_branch {
-    # Speed up opening up a new terminal tab by not
-    # checking $HOME... which can't be a repo anyway
-    [ "$PWD" = "$HOME" ] && return
+RPROMPT='%B%F{yellow} %~'
 
-    # Fastest way I know to check the current branch name
-    ref="$(command git symbolic-ref --short HEAD 2> /dev/null)" || return
-    echo "($ref)"
+
+function user-info () {
+    [[ $UID -eq 0 ]] \
+        && echo '%B%F{red}###%f%b' \
+        || echo '$$$'
 }
 
-# functions for setting the prompt-mode info
-function insert_mode() { echo " -- INSERT -- " }
-function normal_mode() { echo " -- NORMAL -- " }
-function visual_mode() { echo " -- VISUAL -- " }
+function prompt_text () { echo "[${1}]" $(user-info)" %b" }
+function insert-mode () { echo "%B%F{cyan}INSERT%f%b" }
+function normal-mode () { echo "%B%F{blue}NORMAL%f%b" }
+function visual-mode () { echo "%B%F{red}VISUAL%f%b" }
 
-autoload -Uz vcs_info
-precmd_vcs_info() { vcs_info }
+precmd () {
 
-precmd_functions=( 
-    precmd_vcs_info 
-)
+    # this is required for initial prompt and a problem I had with Ctrl+C or
+    # Enter when in normal mode (a new line would come up in insert mode,
+    # but normal mode would be indicated)
+    # prompt="%{$terminfo_down_sc$(insert-mode)$terminfo[rc]%}$prompt_text"
+    PROMPT="$(prompt_text $(insert-mode))"
+    echo -ne "$CURSOR_INSERT"
+}
 
-setopt prompt_subst
-GIT_NULL="####"
-PROMPT='%B%F{cyan}{'\${vcs_info_msg_0_:-$GIT_NULL}'}%f%B %% %b'
-RPROMPT='%B%F{yellow}(%~)'
-zstyle ':vcs_info:git:*' formats '%b'
-zstyle ':vcs_info:*' enable git
+function set-prompt () {
+    case ${KEYMAP} in 
+        (vivis|vivli)   
+            VI_MODE="$(visual-mode)"
+            echo -ne "$CURSOR_VISUAL" 
+            ;;
+        (vicmd)         
+            VI_MODE="$(normal-mode)" 
+            echo -ne "$CURSOR_NORMAL" 
+            ;;
+        (*)    
+            VI_MODE="$(insert-mode)"
+            echo -ne "$CURSOR_INSERT" 
+            ;;
+    esac
 
+    PROMPT="$(prompt_text $VI_MODE)"
+}
 
-#PROMPT="%B%{$fg[cyan]%}$(git_branch)%{$fg[white]%} $ %{$reset_color%}" 
-#RPROMPT="%B(%{$fg[yellow]%}%~%{$fg[white])%}%{$reset_color%}"
+function zle-line-init zle-keymap-select {
+    set-prompt
+    zle reset-prompt
+}
+preexec () { print -rn -- $terminfo[el]; }
 
-
-
-
-
-
-
-
-
-
+zle -N zle-line-init
+zle -N zle-keymap-select
