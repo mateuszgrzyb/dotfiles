@@ -1,7 +1,7 @@
 #!/usr/bin/zsh
 
 # dotfiles
-alias dotfiles='git --git-dir=.cfg --work-tree=$HOME'
+alias dotfiles='/usr/bin/git --git-dir=$HOME/.dotfiles --work-tree=$HOME'
 
 # safe versions
 alias mv='mv -i'
