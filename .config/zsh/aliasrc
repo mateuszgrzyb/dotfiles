@@ -43,16 +43,7 @@ alias zshreload='source $HOME/.zshrc'
 
 # open all files in current directory in neovim
 
-alias avim='nvim -p $(command ls)'
-
-# ssh into <user>@pi
-
-function sshpi() {
-    [[ $# -eq 1 ]] && \
-        ssh "${1}@pi" || \
-        echo "Usage: sshpi <user>"
-}
-        
+alias avim='nvim -p $(command ls)' 
 
 # Use lf to switch directories
 
@@ -66,54 +57,3 @@ lf () {
         && cd "$dir"
     fi
 }
-
-# edit startup-scripts
-
-function startup-scripts-edit () {
-	nvim /usr/local/bin/startup-scripts
-}
-
-# assemble and link file
-
-function assemble() {
-    for asmfile in "$@"
-    do
-        filename="${asmfile%%'.asm'}"
-        ofile="${filename}.o"
-        xfile="${filename}.x"
-
-        as -o "$ofile" "$asmfile" && \
-        echo "assembly successful" && \
-        ld -o "$xfile" "$ofile" && \
-        echo "linking successful" && \
-        rm "$ofile"
-    done
-}
-
-# create bootable usb with given iso
-
-function flashiso() {
-    #[[ "$EUID" -ne 0 ]] && \
-    #{
-    #    echo "run $0 as a root"
-    #    result="error"
-    #}
-    if ! [[ "$1" =~ '.iso$' ]]; then
-        echo "first arg is not an .iso file"
-        result="error"
-    fi
-    if [[ "$2" =~ '^/dev/' ]]; then
-        if [[ "$2" =~ '^/dev/sda' ]]; then
-            echo "bruh watch what you dd..."
-            result="error"
-        fi
-    else
-        echo "second arg is not a disk device file"
-        result="error"
-    fi
-    [[ -z "$result" ]] || return
-    echo "dd bs=4M if=$1 of=$2 status=progress oflag=sync"
-}
-
-
-

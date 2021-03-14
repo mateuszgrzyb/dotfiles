@@ -5,8 +5,6 @@
 # Enable colors and change prompt:
 autoload -U colors && colors
 export EDITOR="nvim"
-#export PDF_READER="zathura"
-#export SXHKD_SHELL='/bin/sh'
 
 # History in cache directory:
 HISTSIZE=10000
@@ -17,7 +15,7 @@ HISTFILE=~/.cache/zsh/history
 setopt interactivecomments
 
 # type dir file to cd
-setopt autocd
+# setopt autocd
 
 # Basic auto/tab complete:
 autoload -U compinit
@@ -56,11 +54,7 @@ source "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
 source "$ZSH_PLUGINS/zsh-vimode-visual/zsh-vimode-visual.zsh"
 
 # auto ls on cd
-autoload -U add-zsh-hook
-add-zsh-hook -Uz chpwd () { l; }
-
-# start with listed files, but not in vscode
-[[ $TERM_PROGRAM == "vscode" ]] || l
+function chpwd() { emulate -L zsh; ls }
 
 # opam configuration
 test -r /home/matt/.opam/opam-init/init.sh && . /home/matt/.opam/opam-init/init.sh > /dev/null 2> /dev/null || true
